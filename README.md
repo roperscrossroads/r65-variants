@@ -2,88 +2,67 @@
 
 ![Royal Kludge R65 Keyboard](via-r65.png)
 
-### Select your branch:
+I purchased two black wired ansi Royal Kludge R65 keyboards from Amazon and I'm not sure if they are the same hardware as the ones used in the following projects:
 
-| Branch        | Features              | Description                                             | Link                                                                                   |
-|---------------|-----------------------|---------------------------------------------------------|----------------------------------------------------------------------------------------|
-| 🔨 Master   | QMK, VIA      | The main branch *(with optional Snap Tap feature[^1][^2])*.           | **You are here**                         |
-| 💡 SignalRGB | QMK, VIA + SignalRGB | Stable branch with VIA and SignalRGB support.     | [Go to branch](https://github.com/irfanjmdn/r65/tree/signalrgb)                      |
-| 🧪 VialRGB       | QMK, VIA, Vial + SignalRGB      | Experimental branch with Vial and SignalRGB.[^3]    | [Go to branch](https://github.com/irfanjmdn/r65/tree/vialrgb)                                                      |
+- https://github.com/irfanjmdn/r65
+- https://github.com/iamdanielv/kb_rk_r65
 
----
+This is my attempt to figure out why mine has different software/ids/names (hardware?) than the ones in the projects above. In irfanjmdn's [r65](https://github.com/irfanjmdn/r65) project it says VID: 342D PID: E453 which does not seem to match up with what I see when I run lsusb.
 
-> [!IMPORTANT] 
-> This branch only contains files for the **wired ANSI-layout** version of the Royal Kludge R65.
-> Please review the full [disclaimer](DISCLAIMER.md) before using the files provided in this repository.
 
-- ⌨ 🔌 For the **ISO layout** or other Royal Kludge keyboard variants, visit sdk66’s [QMK Firmware Repo](https://github.com/hangshengkeji/qmk_firmware/tree/master/keyboards/rk).
-- ⌨ 🛠 For a more **customized** version of the firmware for the R65, visit iamdanielv's [R65 Custom Firmware Repo](https://github.com/iamdanielv/kb_rk_r65).
+## My Board
 
-To developers who would want to contribute, any and all help would be greatly appreciated! Feel free to submit improvements, fixes, or suggestions.
+lsusb output in normal mode:
 
----
+```
+cBus 002 Device 008: ID 342d:e481 Hangsheng RK-R65
+```
 
-## Overview
 
-The Royal Kludge RKR65 is a 66-key RGB backlit keyboard with Chartreuse, Brown, or Blue switches. It offers a gasket structure for a soft typing experience, knob adjustment, ergonomic design, and hot-swappable keys.
+lsusb output in dfu mode:
 
-When I bought this keyboard, I was told it was open source by the seller, but they never gave out the files on their website. After weeks of emails and follow-ups, I finally received the QMK firmware for the Royal Kludge R65. 
+```
+Bus 002 Device 009: ID 342d:dfa0 Westberry Tech. WB Device in DFU Mode
+```
 
-🎉 Special thanks to @sdk66 for sharing the initial firmware files, and @iamdanielv for fixing a major portion of the code! 🎉
+## Comparison
 
-## Known Issues
+Both devices share the same Vendor ID (342D) but the Product IDs differ, indicating variations in hardware and/or firmware:
 
-None
 
----
+| Name                          | Product ID (PID) | Vendor ID (VID) |
+|-------------------------------|-------------------|------------------|
+| (mine) Hangsheng RK-R65              | E481              | 342D             |
+| (mine) Westberry Tech WB Device      | DFA0              | 342D             |
+| Project (irfanjmdn's r65)     | E453              | 342D             |
 
-## Guide
 
-### > 🏗 Building the Firmware
+### JSON files
 
-1. **Install QMK MSYS**  
-   Download and install [QMK MSYS](https://msys.qmk.fm).
+Now let's look at the json files I see floating around. Adding in the wireless kb as well. Diffs of the jsons can be seen in the extras folder (screenshots)
 
-2. **Set Up QMK MSYS**  
-   Open QMK MSYS and run the command:  
-   ```bash
-   qmk setup
-   ```
-   A folder will be installed at `C:/Users/%USERNAME%/qmk_firmware`.
+| Filename | Source | Name | Vendor ID (VID) | Product ID (PID) | Processor | Bootloader | Matrix |
+|----------|--------|------|-----------------|------------------|-----------|------------|--------|
+| [RK R65 Layout for Via.json](<./RK R65 Layout for Via.json>)       | irfanjmdn (wired)     | Royal Kludge R65 | 342D | E453 | WB32FQ95 | wb32-dfu |   "matrix": {"rows": 5, "cols": 15}, |
+| [R65 Wired Windows QMK.json](<./R65 Wired Windows QMK.json>)       | rk website (wired)    | RK-R65           | 342D | E481 | - | - |   "matrix": {"rows": 5, "cols": 15} |
+| [R65 Wireless Windows QMK.json](<./R65 Wireless Windows QMK.json>) | rk website (wireless) | RK-R65           | 342D | E453 | - | - | "matrix": {"rows": 5, "cols": 16} |
+| - | lsusb (normal mode) | Hangsheng RK-R65 | 342D | E481 | - | - | - |
+| - | lsusb (dfu mode) | Westberry Tech WB Device (DFU) | 342D | DFA0 | - | - | - |
 
-3. **Add Keyboard Files**  
-   [Download this repository](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/irfanjmdn/r65/tree/master/rk/r65) and move the `rk/r65` folder into your `qmk_firmware/keyboards/` folder.
 
-4. **Compile the Firmware**  
-   Run the following command in QMK MSYS:  
-   ```bash
-   qmk compile -kb rk/r65 -km via
-   ```  
-   (Available options: default/via/via-socd).
+#### Observations
 
-5. **Locate the Firmware File**  
-   Find the compiled `.bin` or `.hex` file in the root of the `qmk_firmware` folder.
+- irfanjmdn's wired board has the same VID&PID as the **wireless** board in the json file: [R65 Wireless Windows QMK.json](<./R65 Wireless Windows QMK.json>) even though they have different matrix configurations
+- irfanjmdn's wired board has a WB32FQ95 processor & DFU mode on my board says: "Westberry Tech WB Device (DFU)" so hopefully they are the same hardware...
+- [RK R65 Layout for Via.json](<./RK R65 Layout for Via.json>) and [R65 Wired Windows QMK.json](<./R65 Wired Windows QMK.json>) are nearly identical, except for the name and IDs
 
-### > ⚡ Flashing/Installing the Firmware
+I am going to try flashing one of my boards with irfanjmdn's code... (to be continued)
 
-1. **Install QMK Toolbox**  
-   Download and install [QMK Toolbox](https://github.com/qmk/qmk_toolbox/releases).
+## Discussions
 
-2. **Load the Firmware File**  
-   Open QMK Toolbox and load the `.bin` or `.hex` file.
+- https://github.com/irfanjmdn/r65/discussions/1
+- https://github.com/iamdanielv/kb_rk_r65/issues
 
-3. **Enter Bootloader Mode**  
-   Reset the keyboard into bootloader mode.
+## Notes
 
-4. **Flash the Firmware**  
-   Click 'Flash', then 'Exit DFU' once the flashing process is complete.
-
-### > 🔓 Entering Bootloader Mode
-
-- **Option 1**: Hold the Reset switch on the PCB while connecting the USB cable.
-- **Option 2**: Hold the Escape key while connecting the USB cable (this will also erase settings).
-- **Option 3**: Press `Fn+Shift+Esc`.
-
-[^1]: Snap Tap/SOCD is a feature that prioritizes the latest input between two selected keys without the need to release the previous one, allowing for faster directional changes. This can enhance gameplay in FPS games by enabling quicker counter-strafing and more responsive movements. 
-[^2]: The Snap Tap/SOCD feature is available in every branch of the repository.
-[^3]: You should use Vial if you have experience with QMK/VIA. If you are new to modifying keyboards, I recommend you [use VIA](https://usevia.app) instead. 
+-  R65 65% Wired Gaming Keyboard (QMK/VIA) - "VIA drivers" zip [link](https://cdn.shopify.com/s/files/1/0510/7866/0274/files/VIA_Software_Download_Guide.zip)
