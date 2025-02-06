@@ -2,28 +2,53 @@
 
 ![Royal Kludge R65 Keyboard](via-r65.png)
 
-I purchased two black wired ansi Royal Kludge R65 keyboards from Amazon and I'm not sure if they are the same hardware as the ones used in the following projects:
+I purchased two black wired ansi Royal Kludge R65 keyboards from Amazon and they had a different version of firmware than what [iamdanielv](https://github.com/iamdanielv/kb_rk_r65) and [irfanjmdn](https://github.com/irfanjmdn) had when they purchased theirs. My lsusb output had a product ID (PID) of e481 instead of e453. However, it appears to be the same hardware. I was able to successfully flash my board with their code.
 
-- https://github.com/irfanjmdn/r65
-- https://github.com/iamdanielv/kb_rk_r65
+You can take the RK65 apart and compare the hardware info with the PCB info below if you are worried about bricking your keyboard. [This video](https://www.youtube.com/watch?v=OxRa_ZbAYyQ) shows how to take it apart.
 
-This is my attempt to figure out why mine has different software/ids/names (hardware?) than the ones in the projects above. In irfanjmdn's [r65](https://github.com/irfanjmdn/r65) project it says VID: 342D PID: E453 which does not seem to match up with what I see when I run lsusb.
 
+My PCB says:
+
+```
+130-83905-01
+VER: 03
+20240319
+```
+
+Westberry Processor:
+
+```
+WB32F
+Q95RCT6
+AP3Y429
+2423
+```
+
+## Relevant Discussions
+
+- https://github.com/iamdanielv/kb_rk_r65/issues/1
+- https://github.com/irfanjmdn/r65/discussions/1
+
+
+# More Details
+
+I am leaving the info below in case it's useful to someone else.
 
 ## My Board
 
-lsusb output in normal mode:
+
+Before flashing, lsusb output in normal mode (after flashing, the VID is **e453**, not e481):
 
 ```
-cBus 002 Device 008: ID 342d:e481 Hangsheng RK-R65
+Bus 002 Device 008: ID 342d:e481 Hangsheng RK-R65
 ```
-
 
 lsusb output in dfu mode:
 
 ```
 Bus 002 Device 009: ID 342d:dfa0 Westberry Tech. WB Device in DFU Mode
 ```
+
 
 ## Comparison
 
@@ -53,16 +78,9 @@ Now let's look at the json files I see floating around. Adding in the wireless k
 #### Observations
 
 - irfanjmdn's wired board has the same VID&PID as the **wireless** board in the json file: [R65 Wireless Windows QMK.json](<./R65 Wireless Windows QMK.json>) even though they have different matrix configurations
-- irfanjmdn's wired board has a WB32FQ95 processor & DFU mode on my board says: "Westberry Tech WB Device (DFU)" so hopefully they are the same hardware...
+- irfanjmdn's wired board has a WB32FQ95 processor & DFU mode on my board says: "Westberry Tech WB Device (DFU)"
 - [RK R65 Layout for Via.json](<./RK R65 Layout for Via.json>) and [R65 Wired Windows QMK.json](<./R65 Wired Windows QMK.json>) are nearly identical, except for the name and IDs
 
-I am going to try flashing one of my boards with irfanjmdn's code... (to be continued)
-
-## Discussions
-
-- https://github.com/irfanjmdn/r65/discussions/1
-- https://github.com/iamdanielv/kb_rk_r65/issues
-
-## Notes
+## Links
 
 -  R65 65% Wired Gaming Keyboard (QMK/VIA) - "VIA drivers" zip [link](https://cdn.shopify.com/s/files/1/0510/7866/0274/files/VIA_Software_Download_Guide.zip)
