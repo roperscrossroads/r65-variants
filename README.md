@@ -37,7 +37,7 @@ I am leaving the info below in case it's useful to someone else.
 ## My Board
 
 
-Before flashing, lsusb output in normal mode (after flashing, the VID is **e453**, not e481):
+Before flashing, lsusb output in normal mode (after flashing, the PID is **e453**, not e481):
 
 ```
 Bus 002 Device 008: ID 342d:e481 Hangsheng RK-R65
